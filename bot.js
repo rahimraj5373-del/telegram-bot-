@@ -8,8 +8,11 @@ bot.start((ctx) => {
     const userId = ctx.from.id;
     usersList.add(userId);
 
+    const totalSubscribers = usersList.size;
+
     const welcomeMessage = `⚡ *Welcome to Tanjirul Pay & Mine!*\n\n` +
-        `🚀 Mine TPZ tokens, complete daily tasks, build your 7-day streaks, and invite friends to earn more!\n\n` +
+        `👥 Total Active Miners: *${totalSubscribers}*\n\n` +
+        `🚀 Mine TPZ tokens, complete daily tasks, build your 7-day streaks, and invite friends to earn more for upcoming listing!\n\n` +
         `👇 Click the button below to launch the app:`;
 
     return ctx.reply(welcomeMessage, {
@@ -21,29 +24,12 @@ bot.start((ctx) => {
     });
 });
 
-bot.command('broadcast', async (ctx) => {
-    const messageText = ctx.message.text.replace('/broadcast', '').trim();
-
-    if (!messageText) {
-        return ctx.reply('⚠️ Please provide a message to broadcast. Example: /broadcast Hello everyone!');
-    }
-
-    ctx.reply(`📢 Broadcasting message to ${usersList.size} users...`);
-
-    for (let userId of usersList) {
-        try {
-            await bot.telegram.sendMessage(userId, `📢 *Announcement:*\n\n${messageText}`, { parse_mode: 'Markdown' });
-        } catch (e) {
-            console.log(`Failed to send to ${userId}:`, e.message);
-        }
-    }
-
-    ctx.reply('✅ Broadcast completed successfully!');
+bot.command('stats', (ctx) => {
+    return ctx.reply(`📊 *Bot Statistics:*\n\n👥 Total Users Started: *${usersList.size}*`, { parse_mode: 'Markdown' });
 });
 
 bot.launch();
-console.log('🤖 Tanjirul Mine Bot is running successfully!');
+console.log('🤖 Tanjirul Mine Bot is running successfully with user tracking!');
 
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
-          
