@@ -1,0 +1,12 @@
+{
+  "name": "tanjirul-telegram-bot",
+  "version": "1.0.0",
+  "description": "Telegram Bot for Tanjirul Pay & Mine",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "telegraf": "^4.12.2"
+  }
+}
