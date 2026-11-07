@@ -1,83 +1,46 @@
-const { Telegraf, Markup } = require('telegraf');
-const fs = require('fs');
+const TelegramBot = require('node-telegram-bot-api');
 
-const bot = new Telegraf('9033382266:AAGY_5InlAkfwh0Ql7v9CYN73Kn1EEzzcuk');
+// বটের টোকেন
+const token = process.env.BOT_TOKEN || '9033382266:AAFR_m7qYCBM5JWDdACVrbMm1emgvC-Jn00';
+const bot = new TelegramBot(token, { polling: true });
 
-const USERS_FILE = 'users.json';
+// আপনার গিটহাব মিনি অ্যাপের লাইভ লিংক এখানে দিন (যেমন: https://your-username.github.io/your-repo-name/)
+const WEB_APP_URL = "https://your-username.github.io/your-repo-name/"; 
+const CHANNEL_URL = "https://t.me/tanjirul0123";
+const TWITTER_URL = "https://x.com/tanjirul_king";
 
-// Load existing users from file
-let users = [];
-if (fs.existsSync(USERS_FILE)) {
-    try {
-        users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
-    } catch (e) {
-        users = [];
-    }
-}
+bot.onText(/\/start/, (msg) => {
+    const chatId = msg.chat.id;
+    const firstName = msg.from.first_name || "User";
 
-function saveUsers() {
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-}
+    const welcomeText = (
+        `⚡ *Welcome to Tanjirul Pay & Mine!*\n\n` +
+        `Hello *${firstName}*! Let's start mining digital assets.\n\n` +
+        `🟢 Tap Start Mining below\n` +
+        `📋 Complete tasks to earn bonus\n` +
+        `👥 Invite friends and earn TPZ\n` +
+        `🎁 Daily streak rewards available!`
+    );
 
-bot.start((ctx) => {
-    const userId = ctx.from.id;
-    
-    // Add user if not already registered
-    if (!users.includes(userId)) {
-        users.push(userId);
-        saveUsers();
-    }
-
-    const totalSubscribers = users.length;
-
-    const welcomeMessage = `⚡ *Welcome to Tanjirul Pay & Mine!*\n\n` +
-        `👥 Total Active Miners: *${totalSubscribers}*\n\n` +
-        `🚀 Mine TPZ tokens, complete daily tasks, build your 7-day streaks, and invite friends to earn more for upcoming listing!\n\n` +
-        `👇 Click the button below to launch the app:`;
-
-    return ctx.reply(welcomeMessage, {
+    const opts = {
         parse_mode: 'Markdown',
-        ...Markup.inlineKeyboard([
-            [Markup.button.webApp('🚀 Open Mining App', 'https://rahimraj5373-del.github.io/tanjirul-app/')],
-            [Markup.button.url('📢 Join Community', 'https://t.me/tanjirul0123'), Markup.button.url('🌐 Twitter (X)', 'https://x.com/tanjirul_king')]
-        ])
-    });
-});
-
-// Broadcast Command: Type /broadcast <your message> in bot chat to send message to all users
-bot.command('broadcast', async (ctx) => {
-    // Only allow you (owner) or anyone testing to broadcast
-    const message = ctx.message.text.replace('/broadcast', '').trim();
-    if (!message) {
-        return ctx.reply('⚠️ দয়া করে মেসেজ লিখুন। উদাহরণ:\n`/broadcast আপনার জরুরি ঘোষণা এখানে`', { parse_mode: 'Markdown' });
-    }
-
-    await ctx.reply(`📤 Broadcasting to ${users.length} users... Please wait.`);
-
-    let successCount = 0;
-    let failCount = 0;
-
-    for (let userId of users) {
-        try {
-            await bot.telegram.sendMessage(userId, message, { parse_mode: 'Markdown' });
-            successCount++;
-            // Small delay to avoid Telegram rate limits
-            await new Promise(resolve => setTimeout(resolve, 50));
-        } catch (err) {
-            failCount++;
+        reply_markup: {
+            inline_keyboard: [
+                [
+                    {
+                        text: "🚀 Open Mining App",
+                        web_app: { url: WEB_APP_URL }
+                    }
+                ],
+                [
+                    { text: "📢 Join Community", url: CHANNEL_URL },
+                    { text: "🌐 Twitter (X)", url: TWITTER_URL }
+                ]
+            ]
         }
-    }
+    };
 
-    return ctx.reply(`✅ Broadcast Complete!\n\nSuccessful: ${successCount}\nFailed: ${failCount}`);
+    bot.sendMessage(chatId, welcomeText, opts);
 });
 
-bot.command('stats', (ctx) => {
-    return ctx.reply(`📊 *Bot Statistics*\n\n👥 Total Users Started: *${users.length}*`, { parse_mode: 'Markdown' });
-});
-
-bot.launch();
-console.log('🤖 Tanjirul Mine Bot is running successfully with persistent user storage!');
-
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
-          
+console.log("Node.js Bot is running successfully...");
