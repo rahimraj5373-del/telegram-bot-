@@ -1,10 +1,20 @@
 const TelegramBot = require('node-telegram-bot-api');
+const http = require('http');
 
-// বটের টোকেন
+// রেন্ডার বা সরাসরি টোকেন
 const token = process.env.BOT_TOKEN || '9033382266:AAFR_m7qYCBM5JWDdACVrbMm1emgvC-Jn00';
 const bot = new TelegramBot(token, { polling: true });
 
-// আপনার গিটহাব মিনি অ্যাপের লাইভ লিংক এখানে দিন (যেমন: https://your-username.github.io/your-repo-name/)
+// রেন্ডার পোর্টের জন্য একটি ডামি HTTP সার্ভার (যাতে পোর্ট এরর না আসে)
+const PORT = process.env.PORT || 3000;
+http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Bot is running successfully!\n');
+}).listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}`);
+});
+
+// আপনার গিটহাব মিনি অ্যাপের লাইভ লিংক এখানে দিন
 const WEB_APP_URL = "https://your-username.github.io/your-repo-name/"; 
 const CHANNEL_URL = "https://t.me/tanjirul0123";
 const TWITTER_URL = "https://x.com/tanjirul_king";
@@ -43,4 +53,4 @@ bot.onText(/\/start/, (msg) => {
     bot.sendMessage(chatId, welcomeText, opts);
 });
 
-console.log("Node.js Bot is running successfully...");
+console.log("Node.js Bot is running successfully with web port...");
